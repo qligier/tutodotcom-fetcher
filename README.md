@@ -12,10 +12,12 @@ tutodotcom-fetcher is a small program that downloads tuto.com tutorial videos.
 Requirements
 ------------
 
- * CLImate by thephpleague <https://github.com/thephpleague/climate><br>
+ * CLImate by thephpleague<br>
+   <https://github.com/thephpleague/climate><br>
    `composer require league/climate`
 
- * hls-fetch by Oskar Liljeblad <https://github.com/osklil/hls-fetch><br>
+ * hls-fetch by Oskar Liljeblad<br>
+   <https://github.com/osklil/hls-fetch><br>
    `apt-get install perl openssl libhtml-parser-perl libwww-perl libjson-perl liburi-perl`
 
 
@@ -23,6 +25,7 @@ Requirements
 Usage
 -----
 
+<img src="screen.png">
 Run `php tutodotcom-fetcher.php -h` for further usage information.
 
 
