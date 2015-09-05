@@ -3,7 +3,7 @@
 require_once 'vendor/autoload.php';
 $cli = new League\CLImate\CLImate;
 
-define('PADDING', 50);
+define('PADDING', 75);
 $browser_headers = [
     'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0',
     'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -133,7 +133,7 @@ foreach ($input_ids AS $input_id) {
     $tutorial_title_sanitized = preg_replace('/.+\/([^,]+),'.$input_id.'\.html.+/s', '$1', $tutorial_page);
     $tutorial_playlist = json_decode(preg_replace('/.+var playlists = ([^;]+);.+/s', '$1', $tutorial_page));
 
-    preg_match_all('/data-hash="([^"]+)" data-slug="([^"]+)">/', $tutorial_page, $chapters_preg);
+    preg_match_all('/data-hash="([^"]+)" data-slug="([^"]*)">/U', $tutorial_page, $chapters_preg);
 
     if (0 === count($chapters_preg[0])) {
         $cli->inline(str_pad('Downloading id '.$input_id, PADDING));
@@ -146,10 +146,10 @@ foreach ($input_ids AS $input_id) {
     for ($j = 0, $count = count($chapters_preg[0]); $j < $count; ++$j)
         $chapters_uid[$chapters_preg[1][$j]] = $chapters_preg[2][$j];
 
-    if (2 > count($chapters_uid)) {
+    if (1 === count($chapters_uid)) {
         $cli->inline(str_pad('['.$input_id.'] Downloading '.$tutorial_title, PADDING));
         $chapter_uid = array_keys($chapters_uid)[0];
-        $chapter_title = array_values($chapters_uid)[0];
+        $chapter_title = (!empty(array_values($chapters_uid)[0])) ? array_values($chapters_uid)[0] : $tutorial_title_sanitized;
 
         if (empty($tutorial_playlist->{$chapter_uid}->urls->hls)) {
             $cli->inline('[')->red()->inline('FAIL')->white()->out(']');
