@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 require_once 'vendor/autoload.php';
 $cli = new League\CLImate\CLImate;
@@ -15,13 +16,13 @@ $browser_headers = [
 $opts = getopt('i:u:p:o:h');
 if (!empty($opts['h']) || empty($opts['i']) || empty($opts['u']) || empty($opts['p']) || empty($opts['o'])) {
     $cli->out('Usage: php tutodotcom-fetcher.php -i [id] -u [user] -p [password] -o [output dir]');
-    $cli->out(' -i  : The ID(s) of the tuto to download (comma-separated)');
-    $cli->out(' -u  : The email to log in with');
-    $cli->out(' -p  : The password to log in with');
-    $cli->out(' -o  : The output directory');
+    $cli->out(' -i       : The ID(s) of the tuto to download (comma-separated)');
+    $cli->out(' -u       : The email to log in with');
+    $cli->out(' -p       : The password to log in with');
+    $cli->out(' -o       : The output directory');
     $cli->out('By example:');
-    $cli->out('php tutodotcom-fetcher.php -i 49913,49140 -u email@domain.com -p password -o /home/tuto.com/videos/');
-    clean_and_die();
+    $cli->blue()->out('php tutodotcom-fetcher.php -i 49913,49140 -u email@domain.com -p password -o /home/tuto.com/videos/');
+    die;
 }
 
 
@@ -133,6 +134,14 @@ foreach ($input_ids AS $input_id) {
     $tutorial_playlist = json_decode(preg_replace('/.+var playlists = ([^;]+);.+/s', '$1', $tutorial_page));
 
     preg_match_all('/data-hash="([^"]+)" data-slug="([^"]+)">/', $tutorial_page, $chapters_preg);
+
+    if (0 === count($chapters_preg[0])) {
+        $cli->inline(str_pad('Downloading id '.$input_id, PADDING));
+        $cli->inline('[')->red()->inline('FAIL')->white()->out(']');
+        $cli->red()->out('No valid video found here');
+        continue 1;
+    }
+
     $chapters_uid = [];
     for ($j = 0, $count = count($chapters_preg[0]); $j < $count; ++$j)
         $chapters_uid[$chapters_preg[1][$j]] = $chapters_preg[2][$j];
@@ -163,7 +172,7 @@ foreach ($input_ids AS $input_id) {
             $cli->inline(str_pad(' - '.$chapter_title, PADDING));
 
             if (empty($tutorial_playlist->{$chapter_uid}->urls->hls)) {
-
+                $cli->inline('[')->red()->inline('FAIL')->white()->out(']');
                 continue 1;
             }
 
